@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  output: "export", // ทำ static export
+  // เพิ่ม options อื่น ๆ ของคุณได้ตรงนี้
+}
 
-export default nextConfig;
+module.exports = nextConfig
