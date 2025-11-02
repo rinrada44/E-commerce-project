@@ -4,5 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  base: '/', // ตั้ง base เป็น root ของ Netlify
+  plugins: [react(), tailwindcss()]
 })
