@@ -1,6 +1,5 @@
-import ProductColorImage from "../components/productColorImage"; 
-
-
+import ProductColorImage from "../schema/productColorImage.schema.js";
+ 
 // Create
 exports.createProductColorImages = async (images) => {
     try {
