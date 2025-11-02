@@ -1,4 +1,5 @@
-const ProductColorImage = require('../schema/ProductColorImage.schema');
+const ProductColorImage = require('../schema/productColorImage.schema');
+
 
 // Create
 exports.createProductColorImages = async (images) => {
