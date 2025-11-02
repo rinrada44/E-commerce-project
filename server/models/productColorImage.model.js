@@ -27,14 +27,15 @@ exports.getAll = async (colorId) => {
   };
   
 
+
 // Read by ID
 exports.getById = async (id) => {
     try {
         const image = await ProductColorImage.findById(id).populate('colorId');
-        if (!image) return res.status(404).json({ message: 'Product image not found' });
+        if (!image) throw new Error('Product image not found'); // แก้ตรงนี้
         return image;
     } catch (err) {
-        throw Error('Error fetching image: ' + err.message);
+        throw new Error('Error fetching image: ' + err.message);
     }
 };
 
@@ -42,13 +43,14 @@ exports.getById = async (id) => {
 exports.remove = async (id) => {
     try {
         const deletedImage = await ProductColorImage.findByIdAndDelete(id);
-        if (!deletedImage) return res.status(404).json({ message: 'Product image not found' });
+        if (!deletedImage) throw new Error('Product image not found'); // แก้ตรงนี้
         return { message: 'Deleted successfully' };
     } catch (err) {
         console.error('Error deleting image:', err);
-        throw Error('Error deleting image: ' + err.message);
-}
-}
+        throw new Error('Error deleting image: ' + err.message);
+    }
+};
+
 
 exports.removeAll = async (colorId) => {
     try {
