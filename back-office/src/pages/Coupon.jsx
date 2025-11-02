@@ -1,15 +1,11 @@
 // src/components/CouponTable.js
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Select, Switch, Pagination, Input, message } from 'antd';
+import { Table, Button, Select, Switch, Pagination, Input, message, Tag } from 'antd';
 import Fuse from 'fuse.js';
 import axios from '../lib/axios';
 import { PlusOutlined } from '@ant-design/icons';
-// ถ้า CouponForm อยู่ใน src/components
 import CouponForm from "../components/CouponForm";
-
-// ถ้า DeleteCoupon อยู่ใน src/components
 import Confirmation from "../components/DeleteCoupon";
-
 
 const CouponTable = () => {
   const discountTypeLabels = {
@@ -30,7 +26,7 @@ const CouponTable = () => {
   const [selectedCouponIdForDelete, setSelectedCouponIdForDelete] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
-  // Fetch coupons from backend
+  // ดึงข้อมูลคูปองจาก backend
   const fetchCoupons = async () => {
     setIsLoading(true);
     try {
@@ -69,15 +65,15 @@ const CouponTable = () => {
     fetchCoupons();
   }, []);
 
-  // Update filters
+  // ฟิลเตอร์และค้นหา
   const applyFilters = (data = coupons) => {
     let filtered = [...data];
 
-    // Status filter
+    // กรองสถานะ
     if (statusFilter === 'active') filtered = filtered.filter(c => c.isActive);
     else if (statusFilter === 'inactive') filtered = filtered.filter(c => !c.isActive);
 
-    // Search filter
+    // ค้นหาจากข้อความ
     if (searchText) {
       const fuse = new Fuse(filtered, { keys: ['code', 'discount_type'] });
       filtered = fuse.search(searchText).map(r => r.item);
@@ -136,6 +132,8 @@ const CouponTable = () => {
     <div>
       {contextHolder}
 
+      <h2 className="text-2xl font-semibold mb-4">จัดการส่วนลด</h2>
+
       <div className="flex justify-between mb-4">
         <div className="flex gap-4">
           <Input
@@ -172,13 +170,23 @@ const CouponTable = () => {
         rowKey="_id"
         pagination={false}
         columns={[
-          { title: 'โค้ด', dataIndex: 'code' },
+          { title: 'ชื่อส่วนลด', dataIndex: 'code' },
           {
             title: "ประเภทส่วนลด",
             dataIndex: "discount_type",
             render: (value) => discountTypeLabels[value] || value,
           },
-          { title: 'จำนวนส่วนลด', dataIndex: 'discount_amount' },
+          {
+            title: 'มูลค่าส่วนลด',
+            render: (_, record) => {
+              if (record.discount_type === 'percentage') {
+                return <Tag color="blue">{record.discount_amount}%</Tag>;
+              } else if (record.discount_type === 'fixed') {
+                return <Tag color="green">{record.discount_amount} บาท</Tag>;
+              }
+              return '-';
+            },
+          },
           {
             title: 'วันเริ่ม',
             dataIndex: 'valid_from',
@@ -199,7 +207,7 @@ const CouponTable = () => {
             ),
           },
           {
-            title: 'หมายเหตุ',
+            title: 'การจัดการ',
             render: (_, record) => (
               <div className="flex space-x-2">
                 <Button onClick={() => handleShowModal(record)}>แก้ไข</Button>

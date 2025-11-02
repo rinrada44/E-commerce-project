@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-
   const [token, setToken] = useState(null);
   const router = useRouter();
 
@@ -27,7 +26,6 @@ export default function LoginPage() {
 
   return (
     (<div className="grid min-h-svh lg:grid-cols-2">
-      
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="/" className="flex items-center gap-2 font-medium">
@@ -44,7 +42,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
       <div className="bg-muted relative hidden lg:block">
         <img
           src="/login-page.jpg"

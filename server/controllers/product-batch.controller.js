@@ -2,10 +2,11 @@ const productBatchService = require('../models/product-batch.model');
 
 const createProductBatch = async (req, res) => {
   try {
+    // ส่งข้อมูลจาก frontend ไปตรง ๆ model (batchCode gen ใน pre-save hook)
     const batch = await productBatchService.create(req.body);
     res.status(201).json(batch);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(400).json({ message: err.message });
   }
 };
@@ -26,12 +27,14 @@ const getProductBatchById = async (req, res) => {
     if (!batch) return res.status(404).json({ message: 'Batch not found' });
     res.status(200).json(batch);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
 const updateProductBatch = async (req, res) => {
   try {
+    if (req.body.batchCode) delete req.body.batchCode; // ป้องกันแก้ batchCode
     const updated = await productBatchService.update(req.params.id, req.body);
     res.status(200).json(updated);
   } catch (err) {
@@ -45,6 +48,7 @@ const deleteProductBatch = async (req, res) => {
     await productBatchService.remove(req.params.id);
     res.status(204).end();
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -54,5 +58,5 @@ module.exports = {
   getAllProductBatches,
   getProductBatchById,
   updateProductBatch,
-  deleteProductBatch,
+  deleteProductBatch
 };

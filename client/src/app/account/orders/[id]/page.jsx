@@ -1,24 +1,17 @@
 'use client'
-import React, { useEffect, useState } from 'react';
-import UserLayout from '@/components/layout/UserLayout';
+
+import MainLayout from '@/components/layout/main';
 import SingleOrder from '@/components/user/SingleOrder';
 import { useParams } from 'next/navigation';
+import React from 'react'
 
-function OrderPage() {
-  const { id } = useParams();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setReady(true);
-  }, []);
-
-  if (!ready) return <p>Loading...</p>;
-
+function page() {
+    const { id } = useParams(); // dynamic route /order/[id]
   return (
-    <UserLayout>
-      <SingleOrder id={id} />
-    </UserLayout>
-  );
+    <MainLayout>
+        <SingleOrder id={id} />
+    </MainLayout>
+  )
 }
 
-export default OrderPage;
+export default page

@@ -4,11 +4,8 @@ import OrderHistory from '@/components/user/OrderHistory'
 import React from 'react'
 import useRouteGuard from "@/hooks/routeGuard";
 
-function Page() {
-  if (typeof window !== "undefined") {
+function page() {
     useRouteGuard();
-  }
-
   return (
     <UserLayout>
       <OrderHistory />
@@ -16,4 +13,4 @@ function Page() {
   )
 }
 
-export default Page;
+export default page

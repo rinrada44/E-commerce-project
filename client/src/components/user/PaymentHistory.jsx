@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 
 import toPrice from "@/lib/toPrice";
-import { ScrollArea } from "../ui/scroll-area";
 
 const PaymentHistory = () => {
   const token = getToken();
@@ -118,134 +117,133 @@ const PaymentHistory = () => {
                   </div>
 
                   <CardFooter>
-                    <div className="flex justify-center items-center w-full">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="link"
-                            size="sm"
-                          >
-                            ดูรายละเอียด
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md rounded-2xl p-6">
-                          <DialogHeader>
-                            <DialogTitle className="text-lg font-semibold">
-                              รายละเอียดออเดอร์
-                            </DialogTitle>
-                          </DialogHeader>
-                          <ScrollArea className="h-auto lg:h-[70vh]">
-                            <div className="grid grid-cols-1 gap-4 text-sm text-gray-700 pt-4">
-                              <div className="flex justify-between">
-                                <span className="font-medium text-gray-500">
-                                  Order ID:
-                                </span>
-                                <span className="text-right break-all">
-                                  {order._id}
-                                </span>
-                              </div>
+                  <div className="flex justify-center items-center w-full">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="link"
+                          size="sm"
+                        >
+                          ดูรายละเอียด
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md rounded-2xl p-6">
+                        <DialogHeader>
+                          <DialogTitle className="text-lg font-semibold">
+                            รายละเอียดออเดอร์
+                          </DialogTitle>
+                        </DialogHeader>
 
-                              <div className="flex justify-between">
-                                <span className="font-medium text-gray-500">
-                                  วันที่สั่งซื้อ:
-                                </span>
-                                <span className="text-right">
-                                  {dateFormat(order.order_date)}
-                                </span>
-                              </div>
-                              <div className="pt-2 flex justify-between text-sm font-medium">
-                                <span className="font-medium text-gray-500">
-                                  ช่องทางการชำระ
-                                </span>
-                                <span>
-                                  {order.payment_method === "promptpay" ? (
-                                    <div className="flex items-center gap-2">
-                                      <img
-                                        src="/thaiqr.jpg"
-                                        alt="PromptPay"
-                                        className="h-4"
-                                      />
-                                      <p>PromptPay</p>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-2">
-                                      <img
-                                        src="/card.png"
-                                        alt="PromptPay"
-                                        className="h-4"
-                                      />
-                                      <p>Card</p>
-                                    </div>
-                                  )}
-                                </span>
-                              </div>
+                        <div className="grid grid-cols-1 gap-4 text-sm text-gray-700 pt-4">
+                          <div className="flex justify-between">
+                            <span className="font-medium text-gray-500">
+                              Order ID:
+                            </span>
+                            <span className="text-right break-all">
+                              {order._id}
+                            </span>
+                          </div>
 
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-800 mb-2">
-                                  สรุปการเงิน
-                                </h4>
-                                <div className="p-4 border border-gray-500 rounded">
-                                  <div className="flex justify-between text-sm text-gray-700 font-semibold">
-                                    <span>ราคารวม</span>
-                                    <span>
-                                      {toPrice(order.amount - order.payment_fee)}
-                                    </span>
+                          <div className="flex justify-between">
+                            <span className="font-medium text-gray-500">
+                              วันที่สั่งซื้อ:
+                            </span>
+                            <span className="text-right">
+                              {dateFormat(order.order_date)}
+                            </span>
+                          </div>
+                          <div className="pt-2 flex justify-between text-sm font-medium">
+                            <span className="font-medium text-gray-500">
+                              ช่องทางการชำระ
+                            </span>
+                            <span>
+                              {order.payment_method === "promptpay" ? (
+                                <div className="flex items-center gap-2">
+                                  <img
+                                    src="/thaiqr.jpg"
+                                    alt="PromptPay"
+                                    className="h-4"
+                                  />
+                                  <p>PromptPay</p>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <img
+                                    src="/card.png"
+                                    alt="PromptPay"
+                                    className="h-4"
+                                  />
+                                  <p>Card</p>
+                                </div>
+                              )}
+                            </span>
+                          </div>
+
+                          <div>
+                          <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                            สรุปการเงิน
+                          </h4>
+                          <div className="p-4 border border-gray-500 rounded">
+                            <div className="flex justify-between text-sm text-gray-700 font-semibold">
+                              <span>ราคารวม</span>
+                              <span>
+                                {toPrice(order.amount - order.payment_fee)}
+                              </span>
+                            </div>
+
+                            <div className="pt-2 flex justify-between text-sm text-gray-700 font-semibold">
+                              <span>ค่าธรรมเนียม</span>
+                              <span>{toPrice(order.payment_fee)}</span>
+                            </div>
+                            <div className="border-t border-gray-200 pt-2 flex justify-between text-sm text-gray-700 font-semibold">
+                              <span>รวมทั้งหมด</span>
+                              <span>{toPrice(order.amount)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                            รายการสินค้า
+                          </h4>
+                          <div className="divide-y text-sm border p-2 rounded shadow-sm">
+                            {order.items && order.items.length > 0 ? (
+                              order.items.map((item, i) => (
+                                <div
+                                  key={item._id}
+                                  className="flex items-center gap-3 border-gray-200"
+                                >
+                                  <div className="flex-1">
+                                    <Link
+                                      href={`/product/${item.productId._id}`}
+                                      target="_blank"
+                                      className="font-medium text-gray-900"
+                                    >
+                                      {item.productId?.name ||
+                                        "สินค้าถูกลบไปแล้ว"}
+                                    </Link>
+                                    <p className="text-xs text-gray-500">
+                                      สี: {item.productColorId.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      จำนวน: {item.quantity} ชิ้น | ราคา/ชิ้น:{" "}
+                                      {item.price.toLocaleString()}
+                                    </p>
                                   </div>
-
-                                  <div className="pt-2 flex justify-between text-sm text-gray-700 font-semibold">
-                                    <span>ค่าธรรมเนียม</span>
-                                    <span>{toPrice(order.payment_fee)}</span>
-                                  </div>
-                                  <div className="border-t border-gray-200 pt-2 flex justify-between text-sm text-gray-700 font-semibold">
-                                    <span>รวมทั้งหมด</span>
-                                    <span>{toPrice(order.amount)}</span>
+                                  <div className="text-sm font-bold text-right whitespace-nowrap">
+                                    {toPrice(item.total)}
                                   </div>
                                 </div>
-                              </div>
-                            </div>
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-800 mb-2">
-                                รายการสินค้า
-                              </h4>
-                              <div className="divide-y text-sm border p-2 rounded shadow-sm">
-                                {order.items && order.items.length > 0 ? (
-                                  order.items.map((item, i) => (
-                                    <div
-                                      key={item._id}
-                                      className="flex items-center gap-3 border-gray-200"
-                                    >
-                                      <div className="flex-1">
-                                        <Link
-                                          href={`/product/${item.productId._id}`}
-                                          target="_blank"
-                                          className="font-medium text-gray-900"
-                                        >
-                                          {item.productId?.name ||
-                                            "สินค้าถูกลบไปแล้ว"}
-                                        </Link>
-                                        <p className="text-xs text-gray-500">
-                                          สี: {item.productColorId.name}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                          จำนวน: {item.quantity} ชิ้น | ราคา/ชิ้น:{" "}
-                                          {item.price.toLocaleString()}
-                                        </p>
-                                      </div>
-                                      <div className="text-sm font-bold text-right whitespace-nowrap">
-                                        {toPrice(item.total)}
-                                      </div>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <p className="text-gray-500 text-sm">
-                                    ไม่มีสินค้าในคำสั่งซื้อนี้
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                           </ScrollArea> 
-                        </DialogContent>
-                      </Dialog>
+                              ))
+                            ) : (
+                              <p className="text-gray-500 text-sm">
+                                ไม่มีสินค้าในคำสั่งซื้อนี้
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     </div>
                   </CardFooter>
                 </CardContent>

@@ -14,29 +14,28 @@ export default function Footer() {
         {/* Brand Info */}
         <div>
           <Link href="/">
-            <Image src="/logo.png" alt="Logo" width={150} height={40} />
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={150}
+              height={40}
+              priority // สำหรับ LCP
+              style={{ height: "auto" }} // รักษาสัดส่วน
+            />
           </Link>
-         
+
           <p className="text-sm mt-4">
-            89 ถ.พิทักษ์ประชา
+            88/7 Sukhumvit Soi 55 (Thonglor)
           </p>
           <p className="text-sm">
-            ต.เขาสวนกวาง อ.เขาสวนกวาง
+            Khlong Tan Nuea, Watthana Bangkok
           </p>
           <p className="text-sm mb-2">
-            จ.ขอนแก่น 40280
+            10110, Thailand
           </p>
-          
-
-          <div className="flex space-x-2 text-blue-500">
-            <Link href="tel:+66933536177" className="text-sm hover:underline">
-              โทร.0933536177
-            </Link>
-
-            <Link href="tel:+66803257699" className="text-sm hover:underline">
-              โทร.0803257699
-            </Link>
-          </div>
+          <Link href="tel:+6621234567" className="text-sm">
+            +66 2 123 4567
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -49,7 +48,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="https://www.facebook.com/suppexr.yin.s.2025/?rdid=sYW0NPF2cgoS3Mqv" className="hover:underline">
+              <Link href="/contact" className="hover:underline">
                 ติดต่อเรา
               </Link>
             </li>
@@ -63,7 +62,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold text-black mb-4">ช่องทางติดตาม</h4>
           <div className="flex space-x-4">
-            <Link href="https://www.facebook.com/suppexr.yin.s.2025/?rdid=sYW0NPF2cgoS3Mqv" className={buttonVariants({ variant: "outline", size: "icon" })}>
+            <Link href="#" className={buttonVariants({ variant: "outline", size: "icon" })}>
               <Facebook size={24} className="hover:text-black" />
             </Link>
           </div>
@@ -73,11 +72,11 @@ export default function Footer() {
       <div className="mt-10 flex justify-between text-sm border-t border-gray-800 pt-6">
         <p>&copy; {new Date().getFullYear()} Super Jeans Furniture. All rights reserved.</p>
         <div className="flex space-x-1">
-          <Link href="/privacy">นโยบายความเป็นส่วนตัว</Link>
+          <Link href="/privacy">Privacy Policy</Link>
           <p>|</p>
-          <Link href="/terms">เงื่อนไขการให้บริการ</Link>
+          <Link href="/terms">Terms Of Services</Link>
           <p>|</p>
-          <Link href="/cookie">นโยบายคุกกี้</Link>
+          <Link href="/cookie">Cookies Policy</Link>
         </div>
       </div>
     </footer>

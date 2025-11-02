@@ -6,18 +6,15 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Info, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import axios from "@/lib/axios";
 import getToken from "@/hooks/getToken";
 import { jwtDecode } from "jwt-decode";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import Link from "next/link";
 
 export default function AddressManagement() {
   const [addresses, setAddresses] = useState([]);
@@ -48,7 +45,7 @@ export default function AddressManagement() {
     if (!uid) return;
     try {
       const res = await axios.get("/api/address", { params: { userId: uid } });
-      setAddresses(res.data); // Ensure correct key
+        setAddresses(res.data); // Ensure correct key
     } catch (err) {
       console.error("Failed to fetch addresses", err);
     }
@@ -108,109 +105,93 @@ export default function AddressManagement() {
   };
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">จัดการที่อยู่</h1>
-        <Button onClick={openAddModal}>เพิ่มที่อยู่ใหม่</Button>
-      </div>
+      <div className="p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold">จัดการที่อยู่</h1>
+          <Button onClick={openAddModal}>เพิ่มที่อยู่ใหม่</Button>
+        </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {addresses.length > 0 ? (
-          addresses.map((addr) => (
-            <Card key={addr._id} className="border-gray-200">
-              <CardContent className="p-4 space-y-1 relative">
-                <div className="font-semibold">{addr.fullname}</div>
-                <div>{addr.phone}</div>
-                <div>
-                  {addr.address}, ต.{addr.tambon}, อ.{addr.amphure}, จ.
-                  {addr.province} {addr.zip_code}
-                </div>
-              </CardContent>
-              <CardFooter className="flex gap-4 m-0">
-                <Button variant="secondary" onClick={() => openEditModal(addr)}>
-                  <Pencil className="w-4 h-4 mr-1" /> แก้ไข
-                </Button>
-                <Button variant="outline" onClick={() => handleDelete(addr._id)}>
-                  <Trash2 className="w-4 h-4 text-red-500 mr-1" /> ลบ
-                </Button>
-              </CardFooter>
-            </Card>
-          ))
-        ) : (
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>ไม่พบที่อยู่จัดส่ง</AlertTitle>
-            <AlertDescription>
-              <span>
-                เพิ่มที่อยู่จัดส่งเพื่อสั่งซื้อ&nbsp;
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {addresses.map((addr) => (
+              <Card key={addr._id} className="border-gray-200">
+                <CardContent className="p-4 space-y-1 relative">
+                  <div className="font-semibold">{addr.fullname}</div>
+                  <div>{addr.phone}</div>
+                  <div>
+                    {addr.address}, ต.{addr.tambon}, อ.{addr.amphure}, จ.
+                    {addr.province} {addr.zip_code}
+                  </div>
+                </CardContent>
+                <CardFooter className="flex gap-4 m-0">
+                  <Button variant="secondary" onClick={() => openEditModal(addr)}>
+                    <Pencil className="w-4 h-4 mr-1" /> แก้ไข
+                  </Button>
+                  <Button variant="ghost" onClick={() => handleDelete(addr._id)}>
+                    <Trash2 className="w-4 h-4 text-red-500 mr-1" /> ลบ
+                  </Button>
+                </CardFooter>
+              </Card>
+          ))}
+        </div>
 
-              </span>
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingAddress ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่ใหม่"}
-            </DialogTitle>
-            <DialogDescription>
-              <p className="text-sm text-gray-500">กรอกข้อมูลที่อยู่ของคุณเป็นภาษาไทย</p>
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {[
-              ["fullname", "ชื่อ-นามสกุล"],
-              ["phone", "เบอร์โทร"],
-              ["address", "ที่อยู่"],
-            ].map(([name, label]) => (
-              <div key={name} className="grid gap-2">
-                <Label htmlFor={name}>{label}</Label>
-                <Input
-                  name={name}
-                  id={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            ))}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {editingAddress ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่ใหม่"}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
               {[
-                ["tambon", "ตำบล"],
-                ["amphure", "อำเภอ"],
-                ["province", "จังหวัด"],
-                ["zip_code", "รหัสไปรษณีย์"],
+                ["fullname", "ชื่อ-นามสกุล"],
+                ["phone", "เบอร์โทร"],
+                ["address", "ที่อยู่"],
               ].map(([name, label]) => (
-                <div key={name} className="grid gap-2">
-                  <Label htmlFor={name}>{label}</Label>
-                  <Input
-                    name={name}
-                    id={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+                  <div key={name} className="grid gap-2">
+                    <Label htmlFor={name}>{label}</Label>
+                    <Input
+                        name={name}
+                        id={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        required
+                    />
+                  </div>
               ))}
-            </div>
 
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setModalOpen(false)}
-              >
-                ยกเลิก
-              </Button>
-              <Button type="submit">บันทึก</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  ["tambon", "ตำบล"],
+                  ["amphure", "อำเภอ"],
+                  ["province", "จังหวัด"],
+                  ["zip_code", "รหัสไปรษณีย์"],
+                ].map(([name, label]) => (
+                    <div key={name} className="grid gap-2">
+                      <Label htmlFor={name}>{label}</Label>
+                      <Input
+                          name={name}
+                          id={name}
+                          value={formData[name]}
+                          onChange={handleChange}
+                          required
+                      />
+                    </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModalOpen(false)}
+                >
+                  ยกเลิก
+                </Button>
+                <Button type="submit">บันทึก</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
   );
 }

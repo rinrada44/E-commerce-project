@@ -141,19 +141,23 @@ const Rooms = () => {
   };
 
   const handleDelete = async () => {
-    if (!deleteTargetId) return;
-    try {
-      await axios.delete(`/api/rooms/${deleteTargetId}`);
-      messageApi.success('ลบห้องสำเร็จ');
-      loadRooms();
-    } catch (error) {
-      console.error('Error deleting room:', error);
-      messageApi.error(error.response?.data?.message || 'ลบห้องล้มเหลว');
-    } finally {
-      setDeleteConfirmVisible(false);
-      setDeleteTargetId(null);
-    }
-  };
+  if (!deleteTargetId) return;
+
+  try {
+    // ส่ง force=true เพื่อบังคับลบสินค้าพร้อมห้อง
+    await axios.delete(`/api/rooms/${deleteTargetId}?force=true`);
+
+    messageApi.success('ลบห้องสำเร็จ');
+    loadRooms();
+  } catch (error) {
+    console.error('Error deleting room:', error);
+    messageApi.error(error.response?.data?.message || 'ลบห้องล้มเหลว');
+  } finally {
+    setDeleteConfirmVisible(false);
+    setDeleteTargetId(null);
+  }
+};
+
 
   const columns = [
     { title: 'ชื่อห้อง', dataIndex: 'name', key: 'name' },

@@ -30,7 +30,7 @@ export default function ProductCard({ product, imageMode }) {
             <img
               src={imgPath}
               alt={product?.name || "Product Image"}
-              className="object-cover w-full h-60 p-2"
+              className="object-cover w-full h-60"
               onError={() => setImgError(true)}
             />
           ) : (

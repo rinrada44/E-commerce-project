@@ -2,22 +2,29 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
 
-// Get all users
+// ----------------------------------
+// GET /api/users
+// คืน Users ทั้งหมด พร้อม Address
 router.get('/', userController.getAllUsers);
 
-// Get user by ID
+// GET /api/users/:id
+// คืน User ตาม ID พร้อม Address
 router.get('/:id', userController.getUserById);
 
-// Get user by email
+// GET /api/users/email/:email
+// คืน User ตาม Email
 router.get('/email/:email', userController.getUserByEmail);
 
-// Create new user
+// POST /api/users
+// สร้าง User ใหม่
 router.post('/', userController.createUser);
 
-// Update user
+// PUT /api/users/:id
+// อัปเดต User
 router.put('/:id', userController.updateUser);
 
-// Delete user
+// PATCH /api/users/delete/:id
+// ลบ User แบบ soft delete
 router.patch('/delete/:id', userController.deleteUser);
 
-module.exports = router; 
+module.exports = router;

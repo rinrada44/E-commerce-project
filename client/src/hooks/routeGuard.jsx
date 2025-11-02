@@ -1,15 +1,15 @@
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+'use client'
+
+import { useRouter } from 'next/navigation'
+import {useEffect, useState} from 'react'
 
 export default function useRouteGuard() {
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-      }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.replace('/signin')
     }
-  }, [router]);
+  }, [router])
 }

@@ -12,8 +12,6 @@ import ProductCard from "./ProductCard";
 import { Button } from "./ui/button"; // import Button if not imported yet
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Info } from "lucide-react";
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
 
 function ShopProduct({ products, shopTitle }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,9 +33,9 @@ function ShopProduct({ products, shopTitle }) {
   };
 
   return (
-    <Card className="border-none flex-1 my-3 lg:my-12 bg-white">
+    <Card className="border-none flex-1 my-0 lg:my-12 bg-white">
       <CardHeader>
-        <CardTitle>สินค้า{shopTitle}</CardTitle>
+        <CardTitle>{shopTitle}</CardTitle>
         <CardDescription>
           <div className="bg-orange-300 h-1 w-12"></div>
         </CardDescription>
@@ -46,7 +44,7 @@ function ShopProduct({ products, shopTitle }) {
         {currentProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {currentProducts.map((product, index) => (
-              <ProductCard key={index} product={product} imageMode="main-color" />
+            <ProductCard key={index} product={product} imageMode="main-color" />
             ))}
           </div>
         ) : (
@@ -65,22 +63,20 @@ function ShopProduct({ products, shopTitle }) {
             variant="outline"
             onClick={handlePrevPage}
             disabled={currentPage === 1}
-            size="icon"
           >
-            <ChevronLeft className="h-4 w-4" />
+            Previous
           </Button>
 
           <span className="text-sm text-muted-foreground">
-            หน้า {currentPage} จาก {totalPages}
+            Page {currentPage} of {totalPages}
           </span>
 
           <Button
             variant="outline"
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            size="icon"
           >
-            <ChevronRight className="h-4 w-4" />
+            Next
           </Button>
         </div>
       </CardContent>

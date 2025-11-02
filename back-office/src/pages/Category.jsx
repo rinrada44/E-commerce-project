@@ -8,12 +8,12 @@ const Category = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false); // To toggle between edit and create mode
-    const [editingCategory, setEditingCategory] = useState(null); // To store the category being edited
-    const [form] = Form.useForm(); // Form instance for modal form
-    const [searchQuery, setSearchQuery] = useState(''); // State for search input
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [form] = Form.useForm();
+    const [searchQuery, setSearchQuery] = useState('');
     const [deleteCategoryId, setDeleteCategoryId] = useState(null);
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // To toggle delete modal visibility
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
@@ -43,14 +43,13 @@ const Category = () => {
                 content: 'ลบข้อมูลสำเร็จ',
             });
 
-            fetchCategories(); // Re-fetch categories after deletion
-            setIsDeleteModalVisible(false)
+            fetchCategories();
+            setIsDeleteModalVisible(false);
         } catch (error) {
             messageApi.open({
                 type: 'error',
                 content: 'ลบข้อมูลล้มเหลว',
             });
-
         }
     };
 
@@ -62,15 +61,14 @@ const Category = () => {
                 content: 'สร้างข้อมูลสำเร็จ',
             });
 
-            fetchCategories(); // Re-fetch categories after creation
-            setIsModalVisible(false); // Close the modal
-            form.resetFields(); // Reset the form
+            fetchCategories();
+            setIsModalVisible(false);
+            form.resetFields();
         } catch (error) {
             messageApi.open({
                 type: 'error',
                 content: 'สร้างข้อมูลล้มเหลว',
             });
-
         }
     };
 
@@ -83,40 +81,38 @@ const Category = () => {
                     content: 'แก้ไขข้อมูลสำเร็จ',
                 });
 
-                fetchCategories(); // Re-fetch categories after update
-                setIsModalVisible(false); // Close the modal
-                setEditingCategory(null); // Clear the editing category
-                form.resetFields(); // Reset the form
+                fetchCategories();
+                setIsModalVisible(false);
+                setEditingCategory(null);
+                form.resetFields();
             } catch (error) {
                 messageApi.open({
                     type: 'error',
                     content: 'แก้ไขข้อมูลล้มเหลว',
                 });
-
             }
         }
     };
 
     const handleCreateOrEdit = async (values) => {
         if (isEditMode && editingCategory) {
-            await updateCategory(values); // If in edit mode, update category
+            await updateCategory(values);
         } else {
-            await createCategory(values); // If in create mode, create a new category
+            await createCategory(values);
         }
     };
 
     const openEditModal = (category) => {
         setEditingCategory(category);
-        setIsEditMode(true); // Set mode to edit
-        form.setFieldsValue({ name: category.name, description: category.description }); // Set form values for editing
-        setIsModalVisible(true); // Open modal
+        setIsEditMode(true);
+        form.setFieldsValue({ name: category.name, description: category.description });
+        setIsModalVisible(true);
     };
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
 
-    // Filter categories based on search query (filter by name and description)
     const filteredCategories = categories.filter(
         (category) =>
             category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -167,7 +163,6 @@ const Category = () => {
             {contextHolder}
             <h2 className="text-2xl font-semibold mb-4">จัดการประเภทสินค้า</h2>
             <div className="flex justify-between items-center">
-                {/* Search Bar */}
                 <Input
                     placeholder="ค้นหาประเภท..."
                     value={searchQuery}
@@ -181,8 +176,8 @@ const Category = () => {
                     icon={<FaPlus />}
                     onClick={() => {
                         setIsModalVisible(true);
-                        setIsEditMode(false); // Set mode to create when opening modal
-                        form.resetFields(); // Reset form fields
+                        setIsEditMode(false);
+                        form.resetFields();
                     }}
                     className="mb-4"
                 >
@@ -192,7 +187,7 @@ const Category = () => {
 
             <Table
                 columns={columns}
-                dataSource={filteredCategories} // Use filtered categories here
+                dataSource={filteredCategories}
                 rowKey="_id"
                 loading={loading}
             />
@@ -200,7 +195,7 @@ const Category = () => {
             {/* Modal for Creating or Editing Category */}
             <Modal
                 title={isEditMode ? 'แก้ไขประเภท' : 'สร้างประเภท'}
-                visible={isModalVisible}
+                open={isModalVisible}  // <-- เปลี่ยนจาก visible เป็น open
                 onCancel={() => setIsModalVisible(false)}
                 footer={null}
             >
@@ -235,7 +230,7 @@ const Category = () => {
             {/* Delete Confirmation Modal */}
             <Modal
                 title="ต้องการลบข้อมูลใช่หรือไม่?"
-                visible={isDeleteModalVisible}
+                open={isDeleteModalVisible}  // <-- เปลี่ยนจาก visible เป็น open
                 onCancel={() => setIsDeleteModalVisible(false)}
                 footer={[
                     <Button key="cancel" onClick={() => setIsDeleteModalVisible(false)}>

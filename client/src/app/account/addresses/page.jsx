@@ -1,25 +1,17 @@
-'use client'
+"use client"
 
-import React, { useEffect, useState } from 'react';
 import UserLayout from '@/components/layout/UserLayout'
 import AddressManagement from '@/components/user/AddressManagement'
 import useRouteGuard from '@/hooks/routeGuard';
+import React from 'react'
 
-function AddressPage() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    useRouteGuard(); // ตรวจสอบ login
-    setReady(true); // รอ client-side ก่อน
-  }, []);
-
-  if (!ready) return <p>Loading...</p>;
-
+function page() {
+    useRouteGuard();
   return (
     <UserLayout>
-      <AddressManagement />
+        <AddressManagement />
     </UserLayout>
-  );
+  )
 }
 
-export default AddressPage;
+export default page

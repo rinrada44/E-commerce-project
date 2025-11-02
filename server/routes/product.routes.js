@@ -2,23 +2,24 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/product.controller');
 
-// สร้างสินค้าใหม่
+// ✅ สร้างสินค้า
+// POST /api/products/create
 router.post('/create', productController.createProduct);
-// /api/products/create
 
-// ดึงข้อมูลสินค้าทั้งหมด
+// ✅ ดึงสินค้าทั้งหมด
+// GET /api/products
 router.get('/', productController.getAllProducts);
-// /api/products/
 
-router.get('/top-product', productController.getTopProducts);
-// ดึงข้อมูลสินค้าตาม ID
+// ✅ ดึงสินค้าตาม ID
+// GET /api/products/:id
 router.get('/:id', productController.getProductById);
-//  /api/products/6809f0b19fbac73e753e9e0d
 
-// อัพเดตสินค้า
+// ✅ อัพเดตสินค้า
+// PUT /api/products/:id
 router.put('/:id', productController.updateProduct);
 
-// ลบสินค้า
-router.patch('/:id', productController.deleteProduct);
+// ✅ ลบสินค้าแบบ soft delete
+// DELETE /api/products/:id
+router.delete('/:id', productController.deleteProduct);
 
 module.exports = router;

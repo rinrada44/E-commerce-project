@@ -45,10 +45,15 @@ import { useCartStore } from "@/store/useCartStore";
 export default function Topbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
+  const [mounted, setMounted] = useState(false); // สำหรับ client-side render
   const token = getToken();
   const cartCount = useCartStore((state) => state.count);
   const fetchCart = useCartStore((state) => state.fetchCart);
   const setCount = useCartStore((state) => state.setCount);
+
+  useEffect(() => {
+    setMounted(true); // เปิด render ฝั่ง client
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -71,14 +76,22 @@ export default function Topbar() {
     return initials || namePart[0]?.toUpperCase() || "??";
   }
 
+  if (!mounted) return null; // ป้องกัน hydration mismatch
+
   return (
     <header className="w-full bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
-        <div className="flex items-center">
-          <Link href="/" className="shrink-0">
-            <Image src="/logo.png" alt="Logo" width={120} height={40} />
-          </Link>
+        <div className="relative w-32 h-10">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            sizes="128px"
+            className="object-contain"
+            priority // <-- ใส่ตรงนี้
+          />
+
         </div>
 
         {/* Desktop Search Bar */}
@@ -112,37 +125,37 @@ export default function Topbar() {
                 <DropdownMenuItem className="py-2 border-b border-gray-300">
                   <Link href="/account/addresses" className="flex space-x-2">
                     <MapPinCheck />
-                    <p>ที่อยู่ของฉัน</p>
+                    <span>ที่อยู่ของฉัน</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="py-2 border-b border-gray-300">
                   <Link href="/account/orders" className="flex space-x-2">
                     <Truck />
-                    <p>ออเดอร์ของฉัน</p>
+                    <span>ออเดอร์ของฉัน</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="py-2 border-b border-gray-300">
                   <Link href="/account/payments" className="flex space-x-2">
                     <DollarSign />
-                    <p>ประวัติการชำระเงิน</p>
+                    <span>ประวัติการชำระเงิน</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="py-2 border-b border-gray-300">
                   <Link href="/account/review" className="flex space-x-2">
                     <Star />
-                    <p>รีวิวสินค้า</p>
+                    <span>รีวิวสินค้า</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="py-2 border-b border-gray-300">
                   <Link href="/account/change-password" className="flex space-x-2">
                     <Lock />
-                    <p>ตั้งค่ารหัสผ่าน</p>
+                    <span>ตั้งค่ารหัสผ่าน</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="py-2">
-                  <Link href="/signout"className="flex space-x-2">
-                  <LogOut />
-                  <p>ออกจากระบบ</p>
+                  <Link href="/signout" className="flex space-x-2">
+                    <LogOut />
+                    <span>ออกจากระบบ</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -180,16 +193,18 @@ export default function Topbar() {
 
                 <div className="p-2 space-y-4">
                   {isLoggedIn && userData ? (
-                    <div className="flex items-center gap-4 border border-gray-200 rounded p-2">
+                    <div className="flex items-center gap-4 m-2 border border-gray-200 rounded p-4">
                       <Avatar>
                         <AvatarFallback>
                           {getInitialsFromEmail(userData.email)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-gray-700 text-sm mt-2">{userData.email}</p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          สถานะ:{" "}
+                        <span className="text-gray-700 mt-2 block">
+                          {userData.email}
+                        </span>
+                        <div className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                          <span>สถานะ:</span>
                           <Badge
                             variant={
                               userData.isVerified ? "default" : "destructive"
@@ -197,14 +212,10 @@ export default function Topbar() {
                           >
                             {userData.isVerified ? "ปกติ" : "รอการยืนยัน"}
                           </Badge>
-                        </p>
+                        </div>
                       </div>
                     </div>
                   ) : null}
-
-                  {/* Mobile Search Bar
-                  <SearchProduct />
-                  */}
 
                   {/* Navigation Icons */}
                   <div className="flex flex-col gap-2 mt-8">
@@ -220,7 +231,7 @@ export default function Topbar() {
                       className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                     >
                       <Store />
-                      <p>สินค้าทั้งหมด</p>
+                      <span>สินค้าทั้งหมด</span>
                     </Link>
 
                     <Link
@@ -228,7 +239,7 @@ export default function Topbar() {
                       className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                     >
                       <ShoppingCart className="w-5 h-5" />
-                      <p>ตะกร้าสินค้า</p>
+                      <span>ตะกร้าสินค้า</span>
                       <Badge>{cartCount > 9 ? "9+" : cartCount}</Badge>
                     </Link>
 
@@ -237,7 +248,7 @@ export default function Topbar() {
                       className="flex space-x-4 items-center py-4 px-2"
                     >
                       <Heart />
-                      <p>รายการที่ถูกใจ</p>
+                      <span>รายการที่ถูกใจ</span>
                     </Link>
                   </div>
 
@@ -256,35 +267,35 @@ export default function Topbar() {
                           className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                         >
                           <MapPinCheck />
-                          <p>ที่อยู่ของฉัน</p>
+                          <span>ที่อยู่ของฉัน</span>
                         </Link>
                         <Link
                           href="/account/orders"
                           className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                         >
                           <Truck />
-                          <p>ออเดอร์ของฉัน</p>
+                          <span>ออเดอร์ของฉัน</span>
                         </Link>
                         <Link
                           href="/account/payments"
                           className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                         >
                           <DollarSign />
-                          <p>ประวัติการชำระเงิน</p>
+                          <span>ประวัติการชำระเงิน</span>
                         </Link>
                         <Link
                           href="/account/review"
                           className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                         >
                           <Star />
-                          <p>รีวิวสินค้า</p>
+                          <span>รีวิวสินค้า</span>
                         </Link>
                         <Link
                           href="/account/change-password"
                           className="flex space-x-4 items-center py-4 px-2 border-b border-gray-300"
                         >
-                    <Lock />
-                    <p>ตั้งค่ารหัสผ่าน</p>
+                          <Lock />
+                          <span>ตั้งค่ารหัสผ่าน</span>
                         </Link>
                         <Link
                           href="/signout"

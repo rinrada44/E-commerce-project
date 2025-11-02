@@ -1,4 +1,5 @@
 const User = require('../schema/user.schema');
+const Address = require('../schema/address.schema');
 const mongoose = require('mongoose');
 
 // ✅ Create User
@@ -22,21 +23,35 @@ const createUser = async (data) => {
     }
 };
 
-// ✅ Get All Users
+// ✅ Get All Users + Address
 const getAllUsers = async () => {
-    return await User.find({ isDeleted: { $ne: true } }).sort({ created_at: -1 });
+    const users = await User.find({ isDeleted: { $ne: true } }).sort({ created_at: -1 }).lean();
+
+    // Merge Address
+    const usersWithAddress = await Promise.all(
+        users.map(async (user) => {
+            const address = await Address.findOne({ userId: user._id, isDeleted: false }).lean();
+            return { ...user, address };
+        })
+    );
+
+    return usersWithAddress;
 };
 
-// ✅ Get User By ID
+// ✅ Get User By ID + Address
 const getUserById = async (id) => {
     if (!mongoose.Types.ObjectId.isValid(id)) return null;
 
-    return await User.findById(id);
+    const user = await User.findById(id).lean();
+    if (!user) return null;
+
+    const address = await Address.findOne({ userId: user._id, isDeleted: false }).lean();
+    return { ...user, address };
 };
+
 // ✅ Get User By Email
 const getUserByEmail = async (email) => {
-
-    return await User.findOne({email: email});
+    return await User.findOne({ email: email.trim() });
 };
 
 // ✅ Update User
@@ -59,7 +74,7 @@ const updateUser = async (id, data) => {
     }
 };
 
-// ✅ Delete User
+// ✅ Delete User (soft delete)
 const deleteUser = async (id) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(id)) {

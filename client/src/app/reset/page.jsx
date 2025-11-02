@@ -1,40 +1,37 @@
-"use client"; // ทำให้เป็น client component ชัดเจน
+'use client'
+import { GalleryVerticalEnd } from "lucide-react"
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { GalleryVerticalEnd } from "lucide-react";
+import { ForgetForm } from "@/components/forget-form"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ResetForm } from "@/components/reset-form";
 
-function ResetPageContent() {
+export default function ForgetPage() {
+  const [token, setToken] = useState(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-
-  const [tokenInStorage, setTokenInStorage] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("token");
-      setTokenInStorage(storedToken);
+      // Only run in the browser
+      const storedToken = localStorage.getItem('token');
+      setToken(storedToken);
     }
   }, []);
 
   useEffect(() => {
-    if (tokenInStorage) router.push("/");
-  }, [tokenInStorage, router]);
-
-  useEffect(() => {
-    if (!token) router.replace("/signin");
+    if (token) {
+      // Logic to redirect if token is present
+      router.push('/');
+    }
   }, [token, router]);
 
-  if (!token) return null;
-
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
+    (<div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="/" className="flex items-center gap-2 font-medium">
-            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+            <div
+              className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <GalleryVerticalEnd className="size-4" />
             </div>
             Super Jeans Furniture
@@ -42,7 +39,7 @@ function ResetPageContent() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <ResetForm token={token} />
+            <ResetForm />
           </div>
         </div>
       </div>
@@ -50,17 +47,8 @@ function ResetPageContent() {
         <img
           src="/login-page.jpg"
           alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
       </div>
-    </div>
-  );
-}
-
-export default function ResetPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ResetPageContent />
-    </Suspense>
+    </div>)
   );
 }

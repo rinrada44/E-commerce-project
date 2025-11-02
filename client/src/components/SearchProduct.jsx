@@ -62,7 +62,7 @@ function SearchProduct() {
                 type="text"
                 value={q}
                 onChange={handleSearchChange} // Update state and trigger debounce
-                placeholder="ค้นหา..."
+                placeholder="Search products..."
                 className="w-full border border-gray-300 shadow-sm"
             />
 
@@ -84,7 +84,7 @@ function SearchProduct() {
                                     key={product.id}
                                     className="p-4 hover:bg-gray-100 cursor-pointer"
                                 >
-                                    <Link href={`/product/${product._id}`} className="flex items-center gap-4">
+                                    <Link href={`/products/${product._id}`} className="flex items-center gap-4">
                                         <img
                                             src={mainColorImg(product._id, product.main_img)}
                                             className="h-18 w-18 object-cover rounded-md"

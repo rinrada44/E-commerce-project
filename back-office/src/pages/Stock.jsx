@@ -113,13 +113,13 @@ const StockTransactionPage = () => {
       <div className="flex justify-between items-center mb-4 gap-2 flex-wrap">
         <h1 className="text-2xl font-semibold">รายงานคลังสินค้า</h1>
         <div className="flex gap-2 flex-wrap">
-          <Input
+          {/* <Input
             placeholder="ค้นหาประเภทหรือรหัสสินค้า"
             prefix={<SearchOutlined />}
             value={searchText}
             onChange={handleSearch}
             className="w-64"
-          />
+          /> */}
           <Select
             placeholder="ตัวกรองประเภท"
             allowClear

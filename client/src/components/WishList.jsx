@@ -88,7 +88,7 @@ const WishlistPage = () => {
   }
 
   return (
-    <Card className="border-none my-12 bg-white w-full">
+    <Card className="border-none my-12 bg-white">
       <CardHeader>
         <CardTitle>รายการถูกใจ</CardTitle>
         <CardDescription>

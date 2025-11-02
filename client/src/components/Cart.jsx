@@ -9,7 +9,7 @@ import toPrice from "@/lib/toPrice";
 import getToken from "@/hooks/getToken";
 import axios from "@/lib/axios";
 import { jwtDecode } from "jwt-decode";
-import { ChevronRightIcon, Info, Trash2 } from "lucide-react";
+import { ChevronRightIcon, Trash2 } from "lucide-react";
 import { mainColorImg } from "@/lib/imagePath";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -27,10 +27,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { CouponCard } from "./CouponCard";
 import { useCartStore } from "@/store/useCartStore";
-import Link from "next/link";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 const stripePromise = loadStripe(
-  "pk_test_51RBwxJQhacNswncvzTsJ6EGC7QktpWuigrk7Vk2WXrQsY4tXjHlI7wljx2MrafZmBiv8zz6E9Wue5tEvU82bTmCC002AOEDYol"
+  "pk_test_51OcMkyERlYSb0OFi7sJgPUyralDr3AxN4wVcAgZpczRNFlTOEgejTTklmVTNCf0IPFxxazRSIHmDZVO7x5bhcsBN00gmHIOqKH"
 );
 
 const PaymentMethodList = [
@@ -155,6 +153,8 @@ const CartPage = () => {
   };
 
   const getDiscount = () => {
+    if (!selectedCoupon || !selectedCoupon.discount_type) return 0;
+
     const subTotal = beforeDiscount();
     const couponType = selectedCoupon.discount_type;
     let discount = 0;
@@ -162,7 +162,7 @@ const CartPage = () => {
     switch (couponType) {
       case "percentage":
         discount = subTotal * (selectedCoupon.discount_amount / 100);
-        break; // <== Missing in your original code
+        break;
       case "fixed":
         discount = selectedCoupon.discount_amount;
         break;
@@ -171,8 +171,9 @@ const CartPage = () => {
         break;
     }
 
-    return discount; // <== Also missing in your original code
+    return discount;
   };
+
 
 
 
@@ -201,22 +202,24 @@ const CartPage = () => {
       return;
     }
     const payload = {
-      cartId: cartData.cart._id,
-      cart: cartData?.items?.map((item) => ({
-        productId: item.productId._id,
-        productColorId: item.productColorId._id,
-        productName: item.productId.name + " " + item.productColorId.name,
-        quantity: item.quantity,
-        price: item.price,
-        total: item.total,
-      })),
-      addressId: selectedAddress._id,
-      paymentMethod: selectedPaymentMethod.id,
+      cartId: cartData?.cart?._id || "", // fallback ถ้า cartData.cart เป็น null
+      cart: cartData?.items
+        ?.filter(item => item.productId && item.productColorId) // กรองของไม่สมบูรณ์
+        .map((item) => ({
+          productId: item.productId._id,
+          productColorId: item.productColorId._id,
+          productName: `${item.productId.name} ${item.productColorId.name}`,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.total,
+        })) || [], // fallback เป็น array ว่าง
+      addressId: selectedAddress?._id || "",
+      paymentMethod: selectedPaymentMethod?.id || "",
       subtotal: getSubtotal(),
       paymentFee: paymentFee(),
       isDiscount: selectedCoupon ? true : false,
       discount_amount: getDiscount(),
-      couponId: selectedCoupon._id,
+      couponId: selectedCoupon?._id || "",
       userId,
     };
 
@@ -293,37 +296,40 @@ const CartPage = () => {
                       className="flex items-center p-4 gap-4 border border-gray-200 shadow-sm"
                     >
                       <img
-                        src={mainColorImg(
-                          productId._id,
-                          productColorId.main_img
-                        )}
-                        alt={productId.name}
-                        className="w-16 h-16 lg:w-24 lg:h-24 object-cover rounded-md"
+                        src={mainColorImg(productId?._id, productColorId?.main_img)}
+                        alt={productId?.name || "Product"}
+                        className="w-24 h-auto object-cover rounded-md"
                       />
+
+
+
                       <div className="flex flex-col justify-between w-full">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h2 className="font-semibold text-sm lg:textbase">
-                              {productId.name}
+                            <h2 className="font-semibold text-base">
+                              {productId?.name || "Unknown Product"}
                             </h2>
-                            <p className="text-xs lg:text-sm text-gray-500 mt-1">
-                              Color: {productColorId.name}
+                            <p className="text-sm text-gray-500 mt-1">
+                              Color: {productColorId?.name || "Unknown Color"}
                             </p>
+
                             <p className="text-sm text-gray-400 mt-1">
-                              SKU: {productId.sku}
+                              SKU: {productId?.sku || "Unknown SKU"}
                             </p>
+
                           </div>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
                             className="text-red-500"
-                            onClick={() => handleRemoveItem(productColorId._id)}
+                            onClick={() => productColorId?._id && handleRemoveItem(productColorId._id)}
+
                           >
                             <Trash2 size={18} />
                           </Button>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2 mt-4">
+                        <div className="flex justify-between items-center mt-4">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="outline"
@@ -341,12 +347,7 @@ const CartPage = () => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() =>
-                                handleQuantityChange(
-                                  productColorId._id,
-                                  quantity + 1
-                                )
-                              }
+                              onClick={() => productColorId?._id && handleQuantityChange(productColorId._id, Math.max(1, quantity - 1))}
                             >
                               +
                             </Button>
@@ -360,15 +361,7 @@ const CartPage = () => {
                   );
                 })
               ) : (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>ไม่พบสินค้าในตะกร้า</AlertTitle>
-                  <AlertDescription>
-                    <span>
-                      ไปเพิ่มสินค้าเข้าตะกร้า <Link className="text-blue-500 hover:underline" href="/shop">ร้านค้า</Link>
-                    </span>
-                  </AlertDescription>
-                </Alert>
+                <p className="text-gray-600">Your cart is empty.</p>
               )}
             </div>
           </ScrollArea>
@@ -442,45 +435,31 @@ const CartPage = () => {
                       <DialogTitle>เลือกที่อยู่จัดส่ง</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                      {addresses.length > 0 ? (
-                        addresses.map((addr) => (
-                          <Card
-                            key={addr._id}
-                            className={`p-4 cursor-pointer border ${selectedAddress?._id === addr._id ? "border-blue-500" : ""
-                              }`}
-                            onClick={() => {
-                              setSelectedAddress(addr);
-                              setAddressModalOpen(false);
-                            }}
-                          >
-                            <div className="flex flex-col gap-2">
-                              <p className="font-medium">
-                                {addr.fullname} ({addr.phone})
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {addr.address} {addr.tambon} {addr.amphure}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {addr.province} {addr.zip_code}
-                              </p>
-                            </div>
-                          </Card>
-                        ))
-                      ) : (
-                        <Alert>
-                          <Info className="h-4 w-4" />
-                          <AlertTitle>ไม่พบที่อยู่จัดส่ง</AlertTitle>
-                          <AlertDescription>
-                            <span>
-                              เพิ่มที่อยู่จัดส่งเพื่อสั่งซื้อ&nbsp;
-                              <Link href="/account/addresses" className="text-blue-500 hover:underline">
-                                จัดการที่อยู่
-                              </Link>
-                            </span>
-                          </AlertDescription>
-                        </Alert>
-                      )}
-
+                      {addresses.map((addr) => (
+                        <Card
+                          key={addr._id}
+                          className={`p-4 cursor-pointer border ${selectedAddress?._id === addr._id
+                            ? "border-blue-500"
+                            : ""
+                            }`}
+                          onClick={() => {
+                            setSelectedAddress(addr);
+                            setAddressModalOpen(false);
+                          }}
+                        >
+                          <div className="flex flex-col gap-2">
+                            <p className="font-medium">
+                              {addr.fullname} ({addr.phone})
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {addr.address} {addr.tambon} {addr.amphure}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {addr.province} {addr.zip_code}
+                            </p>
+                          </div>
+                        </Card>
+                      ))}
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -545,13 +524,11 @@ const CartPage = () => {
                         <div className="flex justify-between items-center">
                           <div className="flex items-center">
                             <img
-                              src={
-                                selectedPaymentMethod.logo ||
-                                "/default-logo.png"
-                              }
+                              src={selectedPaymentMethod.logo || "/default-logo.png"}
                               alt={selectedPaymentMethod.name}
                               className="w-auto h-8 mr-4"
                             />
+
                             <span className="capitalize">
                               {selectedPaymentMethod.name}
                             </span>

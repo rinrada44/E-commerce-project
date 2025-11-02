@@ -1,13 +1,15 @@
-'use client'
+"use client"
 
-import React from 'react';
-import MainLayout from '@/components/layout/main';
-import UserReviewManager from '@/components/user/ReviewManager';
+import MainLayout from '@/components/layout/main'
+import UserReviewManager from '@/components/user/ReviewManager'
+import React from 'react'
 
-export default function Page() {
+function page() {
   return (
     <MainLayout>
-      <UserReviewManager />
+        <UserReviewManager />
     </MainLayout>
-  );
+  )
 }
+
+export default page

@@ -3,15 +3,12 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
 
 export default function Logout() {
   const router = useRouter()
 
   useEffect(() => {
     localStorage.removeItem('token')
-    localStorage.setItem("cartCount", 0);
-    useCartStore.getState().setCount(0);
     router.push('/signin')
   }, [router])
 

@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Pagination } from '@/components/ui/pagination';
 import { Card } from '@/components/ui/card';
@@ -22,7 +23,9 @@ import { Star } from 'lucide-react';
 const REVIEWS_PER_PAGE = 5;
 
 export default function UserReviewManager() {
-  const [userId, setUserId] = useState(null);
+  const token = getToken();
+  const userId = jwtDecode(token).id;
+
   const [reviews, setReviews] = useState([]);
   const [editingReview, setEditingReview] = useState(null);
   const [editedMessage, setEditedMessage] = useState('');
@@ -32,37 +35,17 @@ export default function UserReviewManager() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Decode token client-side
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUserId(decoded.id);
-      } catch (err) {
-        console.error('Invalid token', err);
-      }
+  const fetchUserReviews = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get('/api/review/user/' + userId);
+      setReviews(res.data.data || []);
+    } catch (error) {
+      toast.error('โหลดรีวิวล้มเหลว');
+    } finally {
+      setLoading(false);
     }
-  }, []);
-
-  // Fetch reviews after userId ready
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchUserReviews = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get('/api/review/user/' + userId);
-        setReviews(res.data.data || []);
-      } catch (error) {
-        toast.error('โหลดรีวิวล้มเหลว');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserReviews();
-  }, [userId]);
+  };
 
   const handleEditSubmit = async () => {
     if (!editedMessage || editedScore < 1 || editedScore > 5) {
@@ -78,11 +61,7 @@ export default function UserReviewManager() {
       });
       toast.success('อัปเดตรีวิวสำเร็จ');
       setEditingReview(null);
-      setEditedMessage('');
-      setEditedScore(0);
-      // Refresh reviews
-      const res = await axios.get('/api/review/user/' + userId);
-      setReviews(res.data.data || []);
+      fetchUserReviews();
     } catch (err) {
       toast.error('แก้ไขรีวิวล้มเหลว');
     } finally {
@@ -95,9 +74,7 @@ export default function UserReviewManager() {
       await axios.delete(`/api/review/${id}`, { isDeleted: true });
       toast.success('ลบรีวิวเรียบร้อย');
       setConfirmDeleteId(null);
-      // Refresh reviews
-      const res = await axios.get('/api/review/user/' + userId);
-      setReviews(res.data.data || []);
+      fetchUserReviews();
     } catch (error) {
       toast.error('ลบรีวิวล้มเหลว');
     }
@@ -108,7 +85,9 @@ export default function UserReviewManager() {
     page * REVIEWS_PER_PAGE
   );
 
-  if (!userId) return <p>Loading user info...</p>;
+  useEffect(() => {
+    fetchUserReviews();
+  }, []);
 
   return (
     <div className="p-6 space-y-4">
@@ -124,17 +103,17 @@ export default function UserReviewManager() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-semibold">{review.productId?.name}</p>
-                <div className="flex space-x-2 pt-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star
-                      key={i}
-                      className={`w-6 ${
-                        i <= review.score
-                          ? 'text-yellow-500 fill-yellow-500'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
+                <div className='flex space-x-2 pt-4'>
+                     {[1, 2, 3, 4, 5].map((i) => (
+                            <Star
+                              key={i}
+                              className={`w-6 ${
+                                i <= review.score
+                                  ? 'text-yellow-500 fill-yellow-500'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
                 </div>
               </div>
               <div className="flex gap-2">

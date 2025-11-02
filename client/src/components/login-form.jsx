@@ -17,9 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useCartStore } from "@/store/useCartStore";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -39,29 +38,23 @@ export function LoginForm({ className, ...props }) {
     },
   });
 
-const onLoginSubmit = async (values) => {
-  try {
-    const res = await axios.post("/api/auth/login", values);
-    
-    const token = res.data.token;
-    localStorage.setItem("token", token);
-
-    // ✅ await the fetchCart call
-    await useCartStore.getState().fetchCart(res.data.user._id);
-
-    toast.success("เข้าสู่ระบบสำเร็จ ระบบกำลังพาคุณกลับไปหน้าหลัก");
-    router.push("/");
-  } catch (error) {
-    const message = error?.response?.data?.message || "Login failed";
-    form.setError("root", { message });
-  }
-};
-
+  const onSubmit = async (values) => {
+    try {
+      const res = await axios.post("/api/auth/login", values);
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+      toast.success("เข้าสู่ระบบสำเร็จ ระบบกำลังพาคุณกลับไปหน้าหลัก")
+      router.push("/");
+    } catch (error) {
+      const message = error?.response?.data?.message || "Login failed";
+      form.setError("root", { message });
+    }
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onLoginSubmit)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className={cn("flex flex-col gap-6", className)}
         {...props}
       >

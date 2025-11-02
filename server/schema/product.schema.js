@@ -42,6 +42,12 @@ const productSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Category'
   },
+  // ✅ เพิ่มประเภทย่อย (SubCategory)
+  subCategoryId: {
+    type: Schema.Types.ObjectId,
+    ref: 'SubCategory', // ต้องมี model ชื่อ SubCategory ในระบบด้วย
+    default: null
+  },
   roomId: {
     type: Schema.Types.ObjectId,
     ref: 'Room'
@@ -64,4 +70,3 @@ const productSchema = new Schema({
 const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;
-

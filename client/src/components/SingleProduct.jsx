@@ -16,13 +16,13 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+} from "@/components/ui/carousel";
+
 import { Button } from "@/components/ui/button";
 import { colorImages, mainColorImg } from "@/lib/imagePath";
 import axios from "@/lib/axios";
 import toPrice from "@/lib/toPrice";
-import { Car, Info, Loader2, ShoppingCart, Smile, Star } from "lucide-react";
+import { Loader2, ShoppingCart, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -44,7 +44,7 @@ function SingleProduct() {
   const [galleryImages, setGalleryImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [review, setReview] = useState([]);
-  const [average, setAverage] = useState(0)
+  const [average, setAverage] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -58,7 +58,8 @@ function SingleProduct() {
           axios.get(`/api/review/product/${id}/average`),
         ]);
 
-        setProduct(productRes.data);
+        setProduct(productRes.data.data);
+
         setProductColors(colorRes.data);
         setReview(reviewRes.data.data);
         setAverage(avgRes.data.data.averageScore);
@@ -103,7 +104,7 @@ function SingleProduct() {
     return (
       <div className="text-center py-20">
         <Loader2 className="animate-spin text-gray-500 mx-auto" size={48} />
-        <p className="mt-4">กำลังโหลดสินค้า...</p>
+        <div className="mt-4">กำลังโหลดสินค้า...</div>
       </div>
     );
   }
@@ -116,10 +117,11 @@ function SingleProduct() {
           {selectedImage ? (
             <div className="bg-gray-100 w-auto md:w-full md:h-[500px] aspect-square overflow-hidden rounded-md">
               <img
-                src={colorImages(product._id, selectedColor._id, selectedImage)}
+                src={`http://localhost:8002/uploads/${selectedImage}`}
                 alt="Selected Product"
                 className="object-cover w-full h-full transition-all duration-300"
               />
+
             </div>
           ) : (
             <Skeleton className="w-full aspect-square rounded-md" />
@@ -128,13 +130,19 @@ function SingleProduct() {
           <div className="flex flex-row md:flex-col items-center rounded w-full md:w-26 gap-1 p-2 mr-2">
             {galleryImages.length > 0 ? (
               galleryImages.map((img, idx) => (
-                  <img
-                    src={colorImages(product._id, selectedColor._id, img)}
-                    alt="Thumbnail"
-                    onClick={() => {setSelectedImage(img)}}
-                    className={`w-20 h-20 flex-shrink-0 bg-white overflow-hidden border-gray-100 rounded cursor-pointer ${selectedImage === img ? "ring-2 ring-black" : ""
+                <Card
+                  key={idx}
+                  onClick={() => handleThumbnailClick(img)}
+                  className={`w-20 h-20 flex-shrink-0 bg-white overflow-hidden border-gray-100 rounded cursor-pointer ${selectedImage === img ? "ring-2 ring-black" : ""
                     }`}
+                >
+                  <img
+                    src={`http://localhost:8002/uploads/${img}`}
+                    alt="Thumbnail"
+                    className="object-cover w-full h-full"
                   />
+
+                </Card>
               ))
             ) : (
               <Skeleton className="w-20 h-20" />
@@ -146,13 +154,13 @@ function SingleProduct() {
           <Card className="border-none shadow-none">
             <CardHeader className="p-0">
               <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <p className="text-2xl font-bold">
+                <div className="text-2xl font-bold">
                   {product.name || <Skeleton className="w-32 h-6" />}
-                </p>
+                </div>
 
                 <div className="flex items-center space-x-1 text-yellow-500">
                   <Star className="w-5 h-5 fill-yellow-500" />
-                  <p className="font-semibold text-base">{average}</p>
+                  <div className="font-semibold text-base">{average}</div>
                 </div>
               </CardTitle>
               <CardDescription className="text-gray-500 text-sm">
@@ -162,25 +170,27 @@ function SingleProduct() {
             </CardHeader>
             <CardContent className="space-y-4 p-0">
               <div className="flex space-x-2">
-                <Badge variant="secondary">{product.categoryId?.name || 'ประเภทถูกลบ'}</Badge>
-                <Badge variant="secondary">{product.roomId?.name || 'ประเภทถูกลบ'}</Badge>
-              </div>
-              <p className="text-muted-foreground">
-                {product.description || <Skeleton className="w-full h-4" />}
-              </p>
-
-              <p className="text-primary text-2xl font-semibold">
-                {product.price ? (
-                  toPrice(product.price)
-                ) : (
-                  <Skeleton className="w-24 h-6" />
+                {product.subCategoryId?.name && (
+                  <Badge variant="secondary">{product.subCategoryId.name}</Badge>
                 )}
-              </p>
-              <Accordion
-                type="single"
-                collapsible
-                className="w-full mb-4"
-              >
+                {product.categoryId?.name && (
+                  <Badge variant="secondary">{product.categoryId.name}</Badge>
+                )}
+                {product.roomId?.name && (
+                  <Badge variant="secondary">{product.roomId.name}</Badge>
+                )}
+              </div>
+
+              {/* แก้ไข DOM nesting */}
+              <div className="text-muted-foreground">
+                {product.description || <Skeleton className="w-full h-4" />}
+              </div>
+
+              <div className="text-primary text-2xl font-semibold">
+                {product.price ? toPrice(product.price) : <Skeleton className="w-24 h-6" />}
+              </div>
+
+              <Accordion type="single" collapsible className="w-full mb-4">
                 <AccordionItem value="select-color">
                   <AccordionTrigger className="text-base font-bold border border-gray-300 px-4 items-center">
                     เลือกสี
@@ -208,9 +218,7 @@ function SingleProduct() {
                     {selectedColor && (
                       <div className="text-sm text-gray-500 mt-2">
                         สินค้าคงเหลือ:{" "}
-                        {selectedColor.quantity ?? (
-                          <Skeleton className="w-16 h-4" />
-                        )}
+                        {selectedColor.quantity ?? <Skeleton className="w-16 h-4" />}
                       </div>
                     )}
                   </AccordionContent>
@@ -218,11 +226,9 @@ function SingleProduct() {
               </Accordion>
 
               {selectedColor && selectedColor.quantity <= 0 ? (
-                <>
-                  <Button className="w-full rounded-full" size="lg" variant='secondary' disabled>
-                    สินค้าหมด
-                  </Button>
-                </>
+                <Button className="w-full rounded-full" size="lg" variant="secondary" disabled>
+                  สินค้าหมด
+                </Button>
               ) : (
                 <Button
                   className="w-full rounded-full"
@@ -258,23 +264,27 @@ function SingleProduct() {
           <AccordionItem value="dimensions">
             <AccordionTrigger>ขนาดสินค้า</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm text-gray-600">{product?.dimensions}</p>
+              <div className="text-sm text-gray-600">
+                {product?.dimensions || <Skeleton className="w-32 h-4" />}
+              </div>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="material">
             <AccordionTrigger>วัสดุที่ใช้</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm text-gray-600">{product?.material}</p>
+              <div className="text-sm text-gray-600">
+                {product?.material || <Skeleton className="w-32 h-4" />}
+              </div>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="weight">
             <AccordionTrigger>น้ำหนัก</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm text-gray-600">
-                {product?.weight} กิโลกรัม
-              </p>
+              <div className="text-sm text-gray-600">
+                {product?.weight ? `${product.weight} กิโลกรัม` : <Skeleton className="w-16 h-4" />}
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -283,10 +293,9 @@ function SingleProduct() {
       <Separator />
       {/* รีวิวสินค้า */}
       <div className="mt-8">
-        <p className="text-xl font-semibold mb-4">รีวิวสินค้า ({review.length || 0})</p>
+        <div className="text-xl font-semibold mb-4">รีวิวสินค้า ({review.length || 0})</div>
 
         <div className="flex flex-col space-y-4">
-
           <Carousel>
             <CarouselContent>
               {review.length > 0 ? (
@@ -309,26 +318,21 @@ function SingleProduct() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm leading-relaxed">{item.message}</p>
+                        <div className="text-sm leading-relaxed">{item.message}</div>
                       </CardContent>
                       <CardFooter>
-                        <p className="text-sm text-gray-500">{dateFormat(item.created_at)}</p>
+                        <div className="text-sm text-gray-500">{dateFormat(item.created_at)}</div>
                       </CardFooter>
                     </Card>
                   </CarouselItem>
                 ))
               ) : (
-                <Alert className="w-full mx-4">
-            <Info className="h-4 w-4" />
-            <AlertTitle>ไม่พบรีวิว</AlertTitle>
-          </Alert>
+                <div className="text-center text-gray-400">ยังไม่มีรีวิว</div>
               )}
-
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
-
         </div>
       </div>
     </div>

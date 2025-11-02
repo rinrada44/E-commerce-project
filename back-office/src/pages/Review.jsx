@@ -21,9 +21,7 @@ import dateFormat from "../lib/dateFormat";
 
 const { Title, Text } = Typography;
 
-//
 // ฟังก์ชันคำนวณค่าเฉลี่ยและจำนวนรีวิวแต่ละดาว
-//
 const getSummary = (reviews) => {
   const total = reviews.length;
   const summary = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -41,26 +39,22 @@ const getSummary = (reviews) => {
   };
 };
 
-//
 // คอมโพเนนต์สรุปรีวิว (กราฟ + ค่าเฉลี่ย)
-//
 const RatingSummary = ({ reviews }) => {
   const { total, average, summary } = getSummary(reviews);
 
   return (
     <Card style={{ marginBottom: 24, borderRadius: 12 }}>
       <Row gutter={24} align="middle">
-        {/* ค่าเฉลี่ยรวม */}
         <Col span={6} style={{ textAlign: "center" }}>
           <h1 style={{ fontSize: 48, margin: 0 }}>{average}</h1>
           <Rate disabled allowHalf defaultValue={Number(average)} />
           <p>{total} เรตติ้ง</p>
         </Col>
 
-        {/* กราฟแยกตามจำนวนดาว */}
         <Col span={18}>
           {Object.keys(summary)
-            .sort((a, b) => b - a) // เรียงจาก 5 → 1
+            .sort((a, b) => b - a)
             .map((star) => (
               <Row key={star} align="middle" style={{ marginBottom: 8 }}>
                 <Col span={2}>{star}★</Col>
@@ -82,9 +76,7 @@ const RatingSummary = ({ reviews }) => {
   );
 };
 
-//
 // หน้า Review หลัก
-//
 const ReviewPage = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [reviews, setReviews] = useState([]);
@@ -98,7 +90,7 @@ const ReviewPage = () => {
     setLoading(true);
     try {
       const response = await axios.get("/api/review");
-      console.log(response.data?.data); // ตรวจสอบ structure ของรีวิว
+      console.log(response.data?.data);
       setReviews(response.data?.data || []);
     } catch (error) {
       console.error(error);
@@ -124,18 +116,29 @@ const ReviewPage = () => {
     fetchReviews();
   }, []);
 
-  // ฟิลเตอร์ตาม search
-  const filteredReviews = reviews.filter((review) =>
-    review.productId?.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  // ✅ ฟิลเตอร์ตามชื่อสินค้า
+  // ✅ ฟิลเตอร์ตามชื่อสินค้า (รองรับทั้ง productId และ productColorId)
+  const filteredReviews = reviews.filter((review) => {
+    const productName =
+      review.productId?.name ||
+      review.productColorId?.productId?.name ||
+      review.productName ||
+      "ไม่ทราบชื่อสินค้า";
+    return productName.toLowerCase().includes(search.toLowerCase());
+  });
 
-  // จัดกลุ่มรีวิวตามสินค้า
+  // ✅ จัดกลุ่มรีวิวตามสินค้า (รองรับทั้ง productId และ productColorId)
   const groupedReviews = filteredReviews.reduce((acc, review) => {
-    const productName = review.productId?.name || "ไม่ทราบชื่อสินค้า";
+    const productName =
+      review.productId?.name ||
+      review.productColorId?.productId?.name ||
+      review.productName ||
+      "ไม่ทราบชื่อสินค้า";
     if (!acc[productName]) acc[productName] = [];
     acc[productName].push(review);
     return acc;
   }, {});
+
 
   return (
     <div>
@@ -162,9 +165,8 @@ const ReviewPage = () => {
         <Text type="secondary">ไม่พบรีวิวที่ตรงกับคำค้นหา</Text>
       ) : (
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
-          {/* แสดงรีวิวแยกตามสินค้า */}
           {Object.keys(groupedReviews).map((productName) => (
-            <Card key={productName} title={productName} bordered={false}>
+            <Card key={productName} title={productName} variant="borderless">
               <List
                 dataSource={groupedReviews[productName]}
                 renderItem={(review) => (
@@ -195,19 +197,22 @@ const ReviewPage = () => {
                       title={
                         <>
                           <Rate disabled defaultValue={review.score} />{" "}
-                          <Text type="secondary">{dateFormat(review.created_at)}</Text>
+                          <Text type="secondary">
+                            {dateFormat(review.created_at || review.createdAt)}
+                          </Text>
                         </>
                       }
                       description={
                         <>
                           <p>{review.message || "ไม่มีความคิดเห็น"}</p>
                           <Text type="secondary">
-                            {review.userId?.name || review.userId?.email || "ไม่ทราบชื่อ"}
+                            {review.userId?.name ||
+                              review.userId?.email ||
+                              "ไม่ทราบชื่อ"}
                           </Text>
                         </>
                       }
                     />
-
                   </List.Item>
                 )}
               />
@@ -218,41 +223,48 @@ const ReviewPage = () => {
 
       {/* Modal สำหรับดูรายละเอียดรีวิว */}
       <Modal
-        title={<span style={{ fontSize: 24 }}>📝 รายละเอียดรีวิว</span>} // ขนาดตัวหนังสือของ title
+        title={<span style={{ fontSize: 24 }}>📝 รายละเอียดรีวิว</span>}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
-        width={800} // ความกว้างของ Modal
-        bodyStyle={{
-          maxHeight: "70vh",  // ให้ scroll ได้ถ้าเนื้อหายาว
-          overflowY: "auto",
-          padding: "24px",
-          fontSize: 18 // ขนาดตัวหนังสือของเนื้อหา
+        width={800}
+        styles={{
+          body: {
+            maxHeight: "70vh",
+            overflowY: "auto",
+            padding: "24px",
+            fontSize: 18,
+          },
         }}
       >
         {selectedReview && (
           <div>
             <p>
-              <b>สินค้า:</b> {selectedReview.productId?.name || "ไม่ทราบชื่อสินค้า"}
+              <b>สินค้า:</b>{" "}
+              {typeof selectedReview.productId === "object"
+                ? selectedReview.productId?.name
+                : selectedReview.productName || "ไม่ทราบชื่อสินค้า"}
             </p>
             <p>
               <b>ลูกค้า:</b>{" "}
-              {selectedReview.userId?.name || selectedReview.userId?.email || "ไม่ทราบชื่อ"}
+              {selectedReview.userId?.name ||
+                selectedReview.userId?.email ||
+                "ไม่ทราบชื่อ"}
             </p>
             <p>
-              <b>คะแนน:</b> <Rate disabled defaultValue={selectedReview.score} />
+              <b>คะแนน:</b>{" "}
+              <Rate disabled defaultValue={selectedReview.score} />
             </p>
             <p>
               <b>ความคิดเห็น:</b> {selectedReview.message || "ไม่มีความคิดเห็น"}
             </p>
             <p>
-              <b>วันที่รีวิว:</b> {dateFormat(selectedReview.createdAt)}
+              <b>วันที่รีวิว:</b>{" "}
+              {dateFormat(selectedReview.created_at || selectedReview.createdAt)}
             </p>
           </div>
         )}
       </Modal>
-
-
     </div>
   );
 };

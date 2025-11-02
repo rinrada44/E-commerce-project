@@ -3,14 +3,14 @@ const Stripe = require('stripe');
 
 let stripeInstance;
 
-async function initializeStripe() {
+function initializeStripe() {
   // Return cached instance if available
   if (stripeInstance) return stripeInstance;
 
-  const stripeSecretKey =  process.env.STRIPE_SECRET_KEY;
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
 
   if (!stripeSecretKey) {
-    console.error('Stripe secret key not found in shop config or environment variables');
+    console.error('Stripe secret key not found in environment variables');
     throw new Error('Stripe secret key is missing');
   }
 
@@ -20,7 +20,10 @@ async function initializeStripe() {
   }
 
   // Initialize and cache Stripe instance
-  stripeInstance = new Stripe(stripeSecretKey);
+  stripeInstance = new Stripe(stripeSecretKey, {
+    apiVersion: '2022-11-15', // เลือกเวอร์ชันล่าสุดตาม Stripe docs
+  });
+
   return stripeInstance;
 }
 
